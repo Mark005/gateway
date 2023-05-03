@@ -1,0 +1,30 @@
+server:
+  port: {SERVICE_PORT:8080}
+
+reactive-clients:
+  auth-service-reactive-client:
+    baseUrl: {AUTH_SERVICE_URL:http://localhost:8081}
+
+services:
+  routes:
+    configs:
+      auth:
+        url: {AUTH_SERVICE_URL:http://localhost:8081}
+
+logging:
+  level:
+    reactor:
+      netty: INFO
+    org:
+      springframework:
+        cloud:
+          gateway: TRACE
+spring:
+  cloud:
+    gateway:
+      httpclient:
+        wiretap: true
+      httpserver:
+        wiretap: true
+
+
