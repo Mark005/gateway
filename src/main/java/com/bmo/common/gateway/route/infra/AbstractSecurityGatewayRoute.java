@@ -1,10 +1,14 @@
 package com.bmo.common.gateway.route.infra;
 
 import com.bmo.common.auth_service.client.AuthServiceReactiveClient;
+import com.bmo.common.auth_service.model.TokenBody;
 import com.bmo.common.auth_service.model.ValidateTokenRequestBody;
 import java.net.URI;
+import java.util.Collections;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.function.Function;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
@@ -23,6 +27,7 @@ import reactor.core.publisher.Mono;
 public abstract class AbstractSecurityGatewayRoute implements GatewayRoute {
 
   private final String SECURITY_USER_ID_HEADER_NAME = "X-Security-User-Id";
+  private final String USER_ID_HEADER_NAME = "X-User-Id";
 
   @Autowired
   @Lazy
@@ -57,14 +62,31 @@ public abstract class AbstractSecurityGatewayRoute implements GatewayRoute {
           .flatMap(authServiceClient::validate)
           .flatMap(tokenBody -> {
 
+            Optional<TokenBody> tokenBodyOpt = Optional.ofNullable(tokenBody);
+            Set<String> authorities = tokenBodyOpt
+                .map(TokenBody::getAuthorities)
+                .orElse(Collections.emptySet());
+
+
             boolean isAccessAllowed = CollectionUtils.isEmpty(requiredAuthorities) ||
-                CollectionUtils.containsAny(tokenBody.getAuthorities(), requiredAuthorities);
+                CollectionUtils.containsAny(
+                    authorities, requiredAuthorities);
 
             if (isAccessAllowed) {
-              String securityUserId = tokenBody.getSecurityUserId().toString();
+              String securityUserId = tokenBodyOpt
+                  .map(TokenBody::getSecurityUserId)
+                  .map(UUID::toString)
+                  .orElse(null);
+
+              String userId = tokenBodyOpt
+                  .map(TokenBody::getUserId)
+                  .map(UUID::toString)
+                  .orElse(null);
 
               exchange.mutate()
-                  .request(builder -> builder.header(SECURITY_USER_ID_HEADER_NAME, securityUserId)
+                  .request(builder -> builder
+                      .header(SECURITY_USER_ID_HEADER_NAME, securityUserId)
+                      .header(USER_ID_HEADER_NAME, userId)
                       .build()).build();
 
               return chain.filter(exchange);
