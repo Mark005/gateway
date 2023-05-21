@@ -1,6 +1,7 @@
 package com.bmo.common.gateway.core.route.infra;
 
 import com.bmo.common.auth_service.client.AuthServiceReactiveClient;
+import com.bmo.common.auth_service.model.Authority;
 import com.bmo.common.auth_service.model.TokenBody;
 import com.bmo.common.auth_service.model.ValidateTokenRequestBody;
 import java.net.URI;
@@ -46,7 +47,7 @@ public abstract class AbstractSecurityGatewayRoute implements GatewayRoute {
   private Mono<Void> authFilter(
       ServerWebExchange exchange,
       GatewayFilterChain chain,
-      Set<String> requiredAuthorities) {
+      Set<Authority> requiredAuthorities) {
     return Mono.defer(() -> {
       String rawBearerToken = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
 
@@ -63,7 +64,7 @@ public abstract class AbstractSecurityGatewayRoute implements GatewayRoute {
           .flatMap(tokenBody -> {
 
             Optional<TokenBody> tokenBodyOpt = Optional.ofNullable(tokenBody);
-            Set<String> authorities = tokenBodyOpt
+            Set<Authority> authorities = tokenBodyOpt
                 .map(TokenBody::getAuthorities)
                 .orElse(Collections.emptySet());
 
@@ -133,7 +134,7 @@ public abstract class AbstractSecurityGatewayRoute implements GatewayRoute {
         });
   }
 
-  public abstract Set<String> getRequireAuthorities();
+  public abstract Set<Authority> getRequireAuthorities();
 
   @Override
   public String getUri() {

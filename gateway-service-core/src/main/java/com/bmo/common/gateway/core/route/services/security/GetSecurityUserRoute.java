@@ -1,5 +1,6 @@
 package com.bmo.common.gateway.core.route.services.security;
 
+import com.bmo.common.auth_service.model.Authority;
 import com.bmo.common.gateway.core.route.infra.AbstractSecurityGatewayRoute;
 import com.bmo.common.gateway.core.route.infra.TargetService;
 import java.util.List;
@@ -31,7 +32,7 @@ public class GetSecurityUserRoute extends AbstractSecurityGatewayRoute {
   }
 
   @Override
-  public Set<String> getRequireAuthorities() {
-    return Set.of("security-user:read");
+  public Set<Authority> getRequireAuthorities() {
+    return Set.of(Authority.SECURITY_USER_READ);
   }
 }
