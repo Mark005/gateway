@@ -20,8 +20,8 @@ ext {
 dependencies {
 	implementation project(':gateway-headers')
 
-	implementation 'com.bmo.common:auth-service-reactive-client:1.0-SNAPSHOT'
-	implementation 'com.bmo.common:auth-service-model:1.0-SNAPSHOT'
+	implementation 'com.bmo.common:auth-service-reactive-client:0.1.0-SNAPSHOT'
+	implementation 'com.bmo.common:auth-service-model:0.1.0-SNAPSHOT'
 
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'

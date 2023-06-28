@@ -8,8 +8,14 @@ reactive-clients:
 services:
   routes:
     configs:
-      auth:
+      auth-service:
         url: ${AUTH_SERVICE_URL:http://localhost:8081}
+      market-service:
+        url: ${MARKET_SERVICE_URL:http://localhost:8082}
+      delivery-service:
+        url: ${DELIVERY_SERVICE_URL:http://localhost:8083}
+      notification-service:
+        url: ${NOTIFICATION_SERVICE_URL:http://localhost:8084}
 
 logging:
   level:

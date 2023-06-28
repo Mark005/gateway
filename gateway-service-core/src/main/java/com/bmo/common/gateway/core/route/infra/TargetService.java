@@ -1,5 +1,8 @@
 package com.bmo.common.gateway.core.route.infra;
 
 public enum TargetService {
-  AUTH
+  AUTH_SERVICE,
+  MARKET_SERVICE,
+  DELIVERY_SERVICE,
+  NOTIFICATION_SERVICE
 }

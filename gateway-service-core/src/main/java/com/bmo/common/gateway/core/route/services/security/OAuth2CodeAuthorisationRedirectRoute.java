@@ -13,7 +13,7 @@ public class OAuth2CodeAuthorisationRedirectRoute extends AbstractSecurityGatewa
 
   @Override
   protected TargetService getService() {
-    return TargetService.AUTH;
+    return TargetService.AUTH_SERVICE;
   }
 
   @Override

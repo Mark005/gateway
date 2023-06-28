@@ -13,7 +13,7 @@ public class RegisterRoute extends AbstractSecurityGatewayRoute {
 
   @Override
   protected TargetService getService() {
-    return TargetService.AUTH;
+    return TargetService.AUTH_SERVICE;
   }
 
   @Override
