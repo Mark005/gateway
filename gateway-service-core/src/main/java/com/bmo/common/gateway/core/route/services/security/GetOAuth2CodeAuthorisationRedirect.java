@@ -1,4 +1,4 @@
-package com.bmo.common.gateway.core.route.services.notification.ws;
+package com.bmo.common.gateway.core.route.services.security;
 
 import com.bmo.common.auth_service.model.Authority;
 import com.bmo.common.gateway.core.route.infra.AbstractSecurityGatewayRoute;
@@ -9,11 +9,11 @@ import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 
 @Service
-public class DeliveryNotificationWebSocketRoute extends AbstractSecurityGatewayRoute {
+public class GetOAuth2CodeAuthorisationRedirect extends AbstractSecurityGatewayRoute {
 
   @Override
   protected TargetService getService() {
-    return TargetService.NOTIFICATION_SERVICE;
+    return TargetService.AUTH_SERVICE;
   }
 
   @Override
@@ -23,21 +23,16 @@ public class DeliveryNotificationWebSocketRoute extends AbstractSecurityGatewayR
 
   @Override
   public List<String> getPathPatterns() {
-    return List.of("/websocket/delivery-notifications");
+    return List.of("/login/oauth2/code/{provider}");
   }
 
   @Override
   public String getTargetRouting() {
-    return "/websocket/delivery-notifications";
+    return "/login/oauth2/code/{provider}";
   }
 
   @Override
   public Set<Authority> getRequiredAuthorities() {
     return Set.of();
-  }
-
-  @Override
-  public boolean authenticatedOnly() {
-    return true;
   }
 }

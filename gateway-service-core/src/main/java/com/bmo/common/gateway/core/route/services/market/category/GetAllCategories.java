@@ -1,4 +1,4 @@
-package com.bmo.common.gateway.core.route.services.security;
+package com.bmo.common.gateway.core.route.services.market.category;
 
 import com.bmo.common.auth_service.model.Authority;
 import com.bmo.common.gateway.core.route.infra.AbstractSecurityGatewayRoute;
@@ -9,11 +9,11 @@ import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 
 @Service
-public class OAuth2CodeAuthorisationRedirectRoute extends AbstractSecurityGatewayRoute {
+public class GetAllCategories extends AbstractSecurityGatewayRoute {
 
   @Override
   protected TargetService getService() {
-    return TargetService.AUTH_SERVICE;
+    return TargetService.MARKET_SERVICE;
   }
 
   @Override
@@ -23,16 +23,17 @@ public class OAuth2CodeAuthorisationRedirectRoute extends AbstractSecurityGatewa
 
   @Override
   public List<String> getPathPatterns() {
-    return List.of("/login/oauth2/code/{provider}");
+    return List.of("/categories");
   }
 
   @Override
   public String getTargetRouting() {
-    return "/login/oauth2/code/{provider}";
+    return "/categories";
   }
 
   @Override
-  public Set<Authority> getRequireAuthorities() {
+  public Set<Authority> getRequiredAuthorities() {
     return Set.of();
   }
+
 }

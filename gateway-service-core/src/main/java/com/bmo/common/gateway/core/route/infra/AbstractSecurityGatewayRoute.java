@@ -4,6 +4,7 @@ import com.bmo.common.auth_service.client.AuthServiceReactiveClient;
 import com.bmo.common.auth_service.model.Authority;
 import com.bmo.common.auth_service.model.TokenBody;
 import com.bmo.common.auth_service.model.ValidateTokenRequestBody;
+import com.bmo.common.gateway.header.GatewayHeader;
 import java.net.URI;
 import java.util.Collections;
 import java.util.Map.Entry;
@@ -11,8 +12,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
-
-import com.bmo.common.gateway.header.GatewayHeader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.route.builder.GatewayFilterSpec;
@@ -40,22 +39,26 @@ public abstract class AbstractSecurityGatewayRoute implements GatewayRoute {
   @Override
   public Function<GatewayFilterSpec, UriSpec> getFilter() {
     return f -> f.filters(
-        (exchange, chain) -> authFilter(exchange, chain, getRequireAuthorities()),
+        this::authFilter,
         this::dynamicRouteFilter);
   }
 
   private Mono<Void> authFilter(
       ServerWebExchange exchange,
-      GatewayFilterChain chain,
-      Set<Authority> requiredAuthorities) {
+      GatewayFilterChain chain) {
     return Mono.defer(() -> {
-      String rawBearerToken = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
+      Set<Authority> requiredAuthorities = getRequiredAuthorities();
+      String rawBearerToken = exchange.getRequest().getHeaders()
+          .getFirst(HttpHeaders.AUTHORIZATION);
 
-      if (!StringUtils.hasText(rawBearerToken)) {
-        if (CollectionUtils.isEmpty(requiredAuthorities)) {
-          return chain.filter(exchange);
+      boolean tokenIsAbsent = !StringUtils.hasText(rawBearerToken);
+
+      if (tokenIsAbsent) {
+        if (authenticatedOnly()) {
+          return responseAs(HttpStatus.UNAUTHORIZED, exchange, chain);
         }
-        return responseAsUnauthorized(exchange, chain);
+
+        return chain.filter(exchange);
       }
 
       return Mono.just(rawBearerToken.replace("Bearer ", ""))
@@ -68,10 +71,8 @@ public abstract class AbstractSecurityGatewayRoute implements GatewayRoute {
                 .map(TokenBody::getAuthorities)
                 .orElse(Collections.emptySet());
 
-
             boolean isAccessAllowed = CollectionUtils.isEmpty(requiredAuthorities) ||
-                CollectionUtils.containsAny(
-                    authorities, requiredAuthorities);
+                CollectionUtils.containsAny(authorities, requiredAuthorities);
 
             if (isAccessAllowed) {
               String securityUserId = tokenBodyOpt
@@ -93,15 +94,18 @@ public abstract class AbstractSecurityGatewayRoute implements GatewayRoute {
               return chain.filter(exchange);
             }
 
-            return responseAsUnauthorized(exchange, chain);
-          });
+            return responseAs(HttpStatus.FORBIDDEN, exchange, chain);
+          })
+          .onErrorResume(throwable -> responseAs(HttpStatus.UNAUTHORIZED, exchange, chain));
     });
   }
 
-  private Mono<Void> responseAsUnauthorized(ServerWebExchange exchange, GatewayFilterChain chain) {
+
+  private Mono<Void> responseAs(HttpStatus status, ServerWebExchange exchange,
+      GatewayFilterChain chain) {
     return Mono.defer(() -> {
       ServerHttpResponse response = exchange.getResponse();
-      response.setStatusCode(HttpStatus.UNAUTHORIZED);
+      response.setStatusCode(status);
       ServerWebExchangeUtils.setAlreadyRouted(exchange);
       return chain.filter(exchange);
     });
@@ -134,7 +138,11 @@ public abstract class AbstractSecurityGatewayRoute implements GatewayRoute {
         });
   }
 
-  public abstract Set<Authority> getRequireAuthorities();
+  public abstract Set<Authority> getRequiredAuthorities();
+
+  public boolean authenticatedOnly() {
+    return !CollectionUtils.isEmpty(getRequiredAuthorities());
+  }
 
   @Override
   public String getUri() {

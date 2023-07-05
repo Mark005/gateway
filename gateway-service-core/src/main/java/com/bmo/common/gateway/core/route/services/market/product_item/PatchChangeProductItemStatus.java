@@ -1,4 +1,4 @@
-package com.bmo.common.gateway.core.route.services.security;
+package com.bmo.common.gateway.core.route.services.market.product_item;
 
 import com.bmo.common.auth_service.model.Authority;
 import com.bmo.common.gateway.core.route.infra.AbstractSecurityGatewayRoute;
@@ -9,30 +9,30 @@ import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 
 @Service
-public class GetSecurityUserRoute extends AbstractSecurityGatewayRoute {
+public class PatchChangeProductItemStatus extends AbstractSecurityGatewayRoute {
 
   @Override
   protected TargetService getService() {
-    return TargetService.AUTH_SERVICE;
+    return TargetService.MARKET_SERVICE;
   }
 
   @Override
   public List<HttpMethod> getMethods() {
-    return List.of(HttpMethod.GET);
+    return List.of(HttpMethod.PATCH);
   }
 
   @Override
   public List<String> getPathPatterns() {
-    return List.of("/security-users/{id}");
+    return List.of("/product-items/{id}/status");
   }
 
   @Override
   public String getTargetRouting() {
-    return "/users/{id}";
+    return "/product-items/{id}/status";
   }
 
   @Override
-  public Set<Authority> getRequireAuthorities() {
-    return Set.of(Authority.SECURITY_USER_READ);
+  public Set<Authority> getRequiredAuthorities() {
+    return Set.of(Authority.PRODUCT_ITEM_UPDATE);
   }
 }
