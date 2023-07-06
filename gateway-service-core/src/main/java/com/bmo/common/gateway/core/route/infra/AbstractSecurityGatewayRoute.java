@@ -1,7 +1,7 @@
 package com.bmo.common.gateway.core.route.infra;
 
 import com.bmo.common.auth_service.client.AuthServiceReactiveClient;
-import com.bmo.common.auth_service.model.Authority;
+import com.bmo.common.auth_service.model.AuthorityEnum;
 import com.bmo.common.auth_service.model.TokenBody;
 import com.bmo.common.auth_service.model.ValidateTokenRequestBody;
 import com.bmo.common.gateway.header.GatewayHeader;
@@ -47,7 +47,7 @@ public abstract class AbstractSecurityGatewayRoute implements GatewayRoute {
       ServerWebExchange exchange,
       GatewayFilterChain chain) {
     return Mono.defer(() -> {
-      Set<Authority> requiredAuthorities = getRequiredAuthorities();
+      Set<AuthorityEnum> requiredAuthorities = getRequiredAuthorities();
       String rawBearerToken = exchange.getRequest().getHeaders()
           .getFirst(HttpHeaders.AUTHORIZATION);
 
@@ -67,7 +67,7 @@ public abstract class AbstractSecurityGatewayRoute implements GatewayRoute {
           .flatMap(tokenBody -> {
 
             Optional<TokenBody> tokenBodyOpt = Optional.ofNullable(tokenBody);
-            Set<Authority> authorities = tokenBodyOpt
+            Set<AuthorityEnum> authorities = tokenBodyOpt
                 .map(TokenBody::getAuthorities)
                 .orElse(Collections.emptySet());
 
@@ -138,7 +138,7 @@ public abstract class AbstractSecurityGatewayRoute implements GatewayRoute {
         });
   }
 
-  public abstract Set<Authority> getRequiredAuthorities();
+  public abstract Set<AuthorityEnum> getRequiredAuthorities();
 
   public boolean authenticatedOnly() {
     return !CollectionUtils.isEmpty(getRequiredAuthorities());

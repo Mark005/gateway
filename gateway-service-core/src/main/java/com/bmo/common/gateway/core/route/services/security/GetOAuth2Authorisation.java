@@ -1,6 +1,6 @@
 package com.bmo.common.gateway.core.route.services.security;
 
-import com.bmo.common.auth_service.model.Authority;
+import com.bmo.common.auth_service.model.AuthorityEnum;
 import com.bmo.common.gateway.core.route.infra.AbstractSecurityGatewayRoute;
 import com.bmo.common.gateway.core.route.infra.TargetService;
 import java.util.List;
@@ -32,7 +32,7 @@ public class GetOAuth2Authorisation extends AbstractSecurityGatewayRoute {
   }
 
   @Override
-  public Set<Authority> getRequiredAuthorities() {
+  public Set<AuthorityEnum> getRequiredAuthorities() {
     return Set.of();
   }
 }
