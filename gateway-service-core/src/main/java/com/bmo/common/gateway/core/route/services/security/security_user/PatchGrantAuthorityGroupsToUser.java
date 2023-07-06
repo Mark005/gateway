@@ -1,4 +1,4 @@
-package com.bmo.common.gateway.core.route.services.security;
+package com.bmo.common.gateway.core.route.services.security.security_user;
 
 import com.bmo.common.auth_service.model.AuthorityEnum;
 import com.bmo.common.gateway.core.route.infra.AbstractSecurityGatewayRoute;
@@ -9,7 +9,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 
 @Service
-public class GetSecurityUser extends AbstractSecurityGatewayRoute {
+public class PatchGrantAuthorityGroupsToUser extends AbstractSecurityGatewayRoute {
 
   @Override
   protected TargetService getService() {
@@ -18,21 +18,21 @@ public class GetSecurityUser extends AbstractSecurityGatewayRoute {
 
   @Override
   public List<HttpMethod> getMethods() {
-    return List.of(HttpMethod.GET);
+    return List.of(HttpMethod.PATCH);
   }
 
   @Override
   public List<String> getPathPatterns() {
-    return List.of("/security-users/{id}");
+    return List.of("/users/{userId}/authority-group/add");
   }
 
   @Override
   public String getTargetRouting() {
-    return "/security-users/{id}";
+    return "/users/{userId}/authority-group/add";
   }
 
   @Override
   public Set<AuthorityEnum> getRequiredAuthorities() {
-    return Set.of(AuthorityEnum.SECURITY_USER_READ);
+    return Set.of(AuthorityEnum.USER_AUTHORITY_UPDATE);
   }
 }
